@@ -40,6 +40,8 @@ services:
       - '5050:80'
     networks:
       - local
+    depends_on:
+      - postgres
 networks:
   local:
     driver: bridge
