@@ -1,10 +1,15 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import CreateUserDto from './dto/createUser.dto';
-import { UpdateUserDto } from './dto/updateUser.dto';
-import AlreadyUsedException from './exception/already-used.exception';
-import User from './users.entity';
+
+// DTO
+import { CreateUserDTO, UpdateUserDTO } from 'src/DTO/users';
+
+// entities
+import User from '../entities/users.entity';
+
+// exceptions
+import AlreadyUsedException from '../exceptions/already-used.exception';
 
 @Injectable()
 export class UsersService {
@@ -12,7 +17,7 @@ export class UsersService {
     @InjectRepository(User) private usersRepository: Repository<User>,
   ) {}
 
-  async create(data: CreateUserDto) {
+  async create(data: CreateUserDTO) {
     const canUseUsername = await this.isUsernameAvailable(data.username);
     if (!canUseUsername) {
       throw new AlreadyUsedException('Username', data.username);
@@ -28,7 +33,7 @@ export class UsersService {
     return newUser;
   }
 
-  async updateUser(id: string, data: UpdateUserDto): Promise<User | null> {
+  async updateUser(id: string, data: UpdateUserDTO): Promise<User | null> {
     const user = await this.usersRepository.findOne(id);
     if (!user) {
       throw new NotFoundException(`User with id ${id} not found!`);

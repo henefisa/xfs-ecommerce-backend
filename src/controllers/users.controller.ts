@@ -9,10 +9,11 @@ import {
   Query,
   UsePipes,
 } from '@nestjs/common';
-import { ValidationPipe } from 'src/shared/pipes/validation.pipe';
-import CreateUserDto from './dto/createUser.dto';
-import { UpdateUserDto } from './dto/updateUser.dto';
-import { UsersService } from './users.service';
+import { ValidationPipe } from 'src/pipes/validation.pipe';
+
+// DTO
+import { CreateUserDTO, UpdateUserDTO } from 'src/DTO/users';
+import { UsersService } from '../services/users.service';
 
 @Controller('users')
 export class UsersController {
@@ -20,7 +21,7 @@ export class UsersController {
 
   @UsePipes(new ValidationPipe())
   @Post('/create')
-  async createUser(@Body() body: CreateUserDto) {
+  async createUser(@Body() body: CreateUserDTO) {
     const user = await this.usersService.create(body);
     return {
       statusCode: HttpStatus.CREATED,
@@ -29,7 +30,7 @@ export class UsersController {
   }
 
   @Patch('/:id')
-  async updateUser(@Param('id') id: string, @Body() body: UpdateUserDto) {
+  async updateUser(@Param('id') id: string, @Body() body: UpdateUserDTO) {
     const user = await this.usersService.updateUser(id, body);
     return {
       statusCode: HttpStatus.OK,

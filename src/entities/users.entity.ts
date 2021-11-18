@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { BeforeInsert, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import bcrypt from 'bcrypt';
 
 @Entity()
 class User {
@@ -10,6 +11,16 @@ class User {
 
   @Column({ unique: true })
   email: string;
+
+  @Column()
+  password: string;
+
+  @BeforeInsert()
+  async hashPassword() {
+    const salt = await bcrypt.genSalt(10);
+    const _pw = await bcrypt.hash(this.password, salt);
+    this.password = _pw;
+  }
 
   @Column()
   firstName: string;
