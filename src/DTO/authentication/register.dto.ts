@@ -6,8 +6,9 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
+import { Match } from 'src/decorators';
 
-export class CreateUserDTO {
+export class RegisterDTO {
   @IsString()
   @MinLength(4)
   @MaxLength(32)
@@ -41,5 +42,6 @@ export class CreateUserDTO {
   @IsString()
   @MinLength(4)
   @MaxLength(32)
+  @Match('password')
   passwordConfirm: string;
 }

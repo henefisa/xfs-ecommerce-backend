@@ -5,29 +5,16 @@ import {
   HttpStatus,
   Param,
   Patch,
-  Post,
   Query,
-  UsePipes,
 } from '@nestjs/common';
-import { ValidationPipe } from 'src/pipes/validation.pipe';
 
 // DTO
-import { CreateUserDTO, UpdateUserDTO } from 'src/DTO/users';
+import { UpdateUserDTO } from 'src/DTO/users';
 import { UsersService } from '../services/users.service';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
-
-  @UsePipes(new ValidationPipe())
-  @Post('/create')
-  async createUser(@Body() body: CreateUserDTO) {
-    const user = await this.usersService.create(body);
-    return {
-      statusCode: HttpStatus.CREATED,
-      user,
-    };
-  }
 
   @Patch('/:id')
   async updateUser(@Param('id') id: string, @Body() body: UpdateUserDTO) {

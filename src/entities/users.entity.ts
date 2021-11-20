@@ -1,10 +1,17 @@
 import { BeforeInsert, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-import bcrypt from 'bcrypt';
+import { genSalt, hash } from 'bcrypt';
 
 @Entity()
-class User {
+export class User {
+  @BeforeInsert()
+  async hashPassword() {
+    const salt = await genSalt(10);
+    const _pw = await hash(this.password, salt);
+    this.password = _pw;
+  }
+
   @PrimaryGeneratedColumn('uuid')
-  id: number;
+  id: string;
 
   @Column({ unique: true })
   username: string;
@@ -14,13 +21,6 @@ class User {
 
   @Column()
   password: string;
-
-  @BeforeInsert()
-  async hashPassword() {
-    const salt = await bcrypt.genSalt(10);
-    const _pw = await bcrypt.hash(this.password, salt);
-    this.password = _pw;
-  }
 
   @Column()
   firstName: string;
@@ -37,8 +37,6 @@ class User {
   @Column({ default: new Date() })
   createdAt: Date;
 
-  @Column({ default: new Date() })
+  @Column({ default: null, nullable: true })
   updatedAt: Date;
 }
-
-export default User;
