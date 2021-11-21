@@ -18,6 +18,7 @@ export class JWTStrategy extends PassportStrategy(Strategy) {
           return request?.cookies?.Authentication;
         },
       ]),
+      ignoreExpiration: false,
       secretOrKey: process.env.ACCESS_TOKEN_SECRET,
     } as StrategyOptions);
   }

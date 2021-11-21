@@ -55,7 +55,12 @@ export class AuthenticationController {
       throw new AlreadyUsedException('Email', body.email);
     }
 
-    return this.authenticationService.register(body);
+    const user = await this.authenticationService.register(body);
+
+    return {
+      statusCode: HttpStatus.CREATED,
+      user,
+    };
   }
 
   @Post('login')
