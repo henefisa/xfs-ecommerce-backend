@@ -6,14 +6,10 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { compare } from 'bcrypt';
-import * as jwt from 'jsonwebtoken';
 import { JwtService } from '@nestjs/jwt';
 
 // entities
 import { User } from 'src/entities';
-
-// exceptions
-import AlreadyUsedException from 'src/exceptions/already-used.exception';
 
 // DTO
 import { RegisterDTO } from 'src/DTO/authentication';
