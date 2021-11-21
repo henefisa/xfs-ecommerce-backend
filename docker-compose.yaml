@@ -42,8 +42,11 @@ services:
       - local
     depends_on:
       - postgres
+    volumes:
+      - pgadmin:/var/lib/pgadmin
 networks:
   local:
     driver: bridge
 volumes:
   db:
+  pgadmin:

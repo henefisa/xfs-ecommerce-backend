@@ -34,6 +34,9 @@ export class User {
   @Column()
   birthday: Date;
 
+  @Column({ nullable: true, default: null })
+  hashedRefreshToken: string;
+
   @Column({ default: new Date() })
   createdAt: Date;
 

@@ -6,7 +6,8 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { compare } from 'bcrypt';
-import jwt from 'jsonwebtoken';
+import * as jwt from 'jsonwebtoken';
+import { JwtService } from '@nestjs/jwt';
 
 // entities
 import { User } from 'src/entities';
@@ -15,152 +16,73 @@ import { User } from 'src/entities';
 import AlreadyUsedException from 'src/exceptions/already-used.exception';
 
 // DTO
-import { LoginDTO, RefreshTokenDTO, RegisterDTO } from 'src/DTO/authentication';
+import { RegisterDTO } from 'src/DTO/authentication';
+
+// interfaces
+import { TokenPayload } from 'src/interfaces';
 
 @Injectable()
 export class AuthenticationService {
   constructor(
     @InjectRepository(User) private usersRepository: Repository<User>,
+    private jwtService: JwtService,
   ) {}
 
   async register(data: RegisterDTO) {
-    const canUseUsername = await this.isUsernameAvailable(data.username);
-    if (!canUseUsername) {
-      throw new AlreadyUsedException('Username', data.username);
-    }
-
-    const canUseEmail = await this.isEmailAvailable(data.email);
-    if (!canUseEmail) {
-      throw new AlreadyUsedException('Email', data.email);
-    }
-
     const newUser = this.usersRepository.create(data);
     await this.usersRepository.save(newUser);
     return newUser;
   }
 
-  async login(data: LoginDTO) {
+  async getAuthenticatedUser(username: string, password: string) {
     const user = await this.usersRepository.findOne({
-      username: data.username,
+      username: username,
     });
     if (!user) {
-      throw new NotFoundException(`${data.username} not found!`);
+      throw new NotFoundException(`${username} not found!`);
     }
 
-    const isValidPassword = await compare(data.password, user.password);
+    const isValidPassword = await compare(password, user.password);
     if (!isValidPassword) {
       throw new UnauthorizedException(`Invalid password!`);
     }
+    return user;
+  }
 
-    const [accessToken, refreshToken] = await Promise.all([
-      this.generateAccessToken(user),
-      this.generateRefreshToken(user.id),
-    ]);
-
+  generateAccessToken(user: User) {
+    const payload: TokenPayload = {
+      userId: user.id,
+      username: user.username,
+      email: user.email,
+    };
+    const token = this.jwtService.sign(payload, {
+      secret: process.env.ACCESS_TOKEN_SECRET,
+      expiresIn: '300s',
+    });
+    const cookie = `Authentication=${token}; HttpOnly; Path=/; Max-Age=${300})}`;
     return {
-      accessToken,
-      refreshToken,
+      token,
+      cookie,
     };
   }
 
-  async refreshToken(data: RefreshTokenDTO) {
-    const id = await this.verifyRefreshToken(data.refreshToken);
-    if (!id) {
-      throw new UnauthorizedException();
-    }
+  getCookieForLogout() {
+    return [
+      'Authentication=; HttpOnly; Path=/; Max-Age=0',
+      'Refresh=; HttpOnly; Path=/; Max-Age=0',
+    ];
+  }
 
-    const user = await this.usersRepository.findOne(id);
-    if (!user) {
-      throw new NotFoundException('User not found!');
-    }
-
-    const [accessToken, refreshToken] = await Promise.all([
-      this.generateAccessToken(user),
-      this.generateRefreshToken(id),
-    ]);
-
+  generateRefreshToken(user: User) {
+    const payload: TokenPayload = { userId: user.id };
+    const token = this.jwtService.sign(payload, {
+      secret: process.env.REFRESH_TOKEN_SECRET,
+      expiresIn: '1d',
+    });
+    const cookie = `Refresh=${token}; HttpOnly; Path=/; Max-Age=1d}`;
     return {
-      accessToken,
-      refreshToken,
+      token,
+      cookie,
     };
-  }
-
-  async isUsernameAvailable(username: string): Promise<boolean> {
-    const user = await this.usersRepository.findOne({ username });
-    if (user) {
-      return false;
-    }
-    return true;
-  }
-
-  async isEmailAvailable(email: string): Promise<boolean> {
-    const user = await this.usersRepository.findOne({ email });
-    if (user) {
-      return false;
-    }
-    return true;
-  }
-
-  generateAccessToken(user: User): Promise<string> {
-    return new Promise((resolve) => {
-      const options = {
-        expiresIn: '1h',
-      };
-
-      jwt.sign(
-        {
-          id: user.id,
-          username: user.username,
-          email: user.email,
-        },
-        process.env.ACCESS_TOKEN_SECRET,
-        options,
-        (error, token) => {
-          if (error) {
-            throw new UnauthorizedException(error.message);
-          }
-          resolve(token);
-        },
-      );
-    });
-  }
-
-  generateRefreshToken(id: string): Promise<string> {
-    return new Promise((resolve) => {
-      const payload = {
-        id,
-      };
-
-      const options = {
-        expiresIn: '10d',
-      };
-
-      jwt.sign(
-        payload,
-        process.env.REFRESH_TOKEN_SECRET,
-        options,
-        (error, token) => {
-          if (error) {
-            throw new UnauthorizedException(error.message);
-          }
-          resolve(token);
-        },
-      );
-    });
-  }
-
-  verifyRefreshToken(refreshToken: string): Promise<string> {
-    return new Promise((resolve) => {
-      jwt.verify(
-        refreshToken,
-        process.env.REFRESH_TOKEN_SECRET,
-        (error, payload) => {
-          if (error) {
-            throw new UnauthorizedException(error.message);
-          }
-          resolve(payload.id);
-        },
-      );
-    });
   }
 }

@@ -6,13 +6,20 @@ import {
   Param,
   Patch,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 
 // DTO
 import { UpdateUserDTO } from 'src/DTO/users';
+
+// guards
+import { JWTAuthenticationGuard } from 'src/guards';
+
+// services
 import { UsersService } from '../services/users.service';
 
 @Controller('users')
+@UseGuards(new JWTAuthenticationGuard())
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
@@ -27,7 +34,7 @@ export class UsersController {
 
   @Get('/:id')
   async getUser(@Param('id') id: string) {
-    const user = await this.usersService.getUser(id);
+    const user = await this.usersService.getUserById(id);
     return {
       statusCode: HttpStatus.OK,
       user,
