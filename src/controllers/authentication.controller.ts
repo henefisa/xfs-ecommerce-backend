@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  HttpCode,
   HttpStatus,
   NotFoundException,
   Post,
@@ -39,6 +40,7 @@ export class AuthenticationController {
   ) {}
 
   @Post('register')
+  @HttpCode(HttpStatus.CREATED)
   @UsePipes(new ValidationPipe())
   async register(@Body() body: RegisterDTO) {
     const isUsernameAvailable = await this.usersService.isUsernameAvailable(
@@ -57,13 +59,13 @@ export class AuthenticationController {
 
     const user = await this.authenticationService.register(body);
 
-    return {
-      statusCode: HttpStatus.CREATED,
-      user,
-    };
+    delete user.password;
+
+    return user;
   }
 
   @Post('login')
+  @HttpCode(HttpStatus.ACCEPTED)
   @UsePipes(new ValidationPipe())
   async login(@Body() body: LoginDTO, @Req() request: Request) {
     const user = await this.usersService.getUserByUsername(body.username);
@@ -88,13 +90,11 @@ export class AuthenticationController {
 
     delete user.password;
 
-    return {
-      statusCode: HttpStatus.ACCEPTED,
-      user,
-    };
+    return user;
   }
 
   @Get('refresh-token')
+  @HttpCode(HttpStatus.OK)
   @UseGuards(JWTRefreshTokenGuard)
   async refreshToken(@Req() request: RequestWithUser) {
     if (!request.user) {
@@ -119,13 +119,12 @@ export class AuthenticationController {
     ]);
 
     delete request.user.password;
-    return {
-      statusCode: HttpStatus.ACCEPTED,
-      user: request.user,
-    };
+
+    return request.user;
   }
 
   @Post('log-out')
+  @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(JWTAuthenticationGuard)
   async logout(@Req() request: RequestWithUser) {
     if (!request.user) {
@@ -137,9 +136,6 @@ export class AuthenticationController {
       this.authenticationService.getCookieForLogout(),
     );
 
-    return {
-      statusCode: HttpStatus.OK,
-      message: 'Logout',
-    };
+    return {};
   }
 }

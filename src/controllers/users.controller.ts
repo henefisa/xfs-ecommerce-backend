@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Query,
+  Req,
   UseGuards,
 } from '@nestjs/common';
 
@@ -14,6 +15,9 @@ import { UpdateUserDTO } from 'src/DTO/users';
 
 // guards
 import { JWTAuthenticationGuard } from 'src/guards';
+
+// interfaces
+import { RequestWithUser } from 'src/interfaces';
 
 // services
 import { UsersService } from '../services/users.service';
@@ -30,6 +34,14 @@ export class UsersController {
       statusCode: HttpStatus.OK,
       user,
     };
+  }
+
+  @UseGuards(JWTAuthenticationGuard)
+  @Get('me')
+  async getMe(@Req() request: RequestWithUser) {
+    delete request.user.password;
+
+    return request.user;
   }
 
   @Get('/:id')
