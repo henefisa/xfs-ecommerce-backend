@@ -2,6 +2,7 @@ import {
   IsDateString,
   IsEmail,
   IsNotEmpty,
+  IsOptional,
   IsString,
   MaxLength,
   MinLength,
@@ -27,7 +28,7 @@ export class RegisterDTO {
   lastName: string;
 
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   phoneNumber: string;
 
   @IsDateString()
@@ -36,12 +37,10 @@ export class RegisterDTO {
 
   @IsString()
   @MinLength(4)
-  @MaxLength(32)
   password: string;
 
   @IsString()
   @MinLength(4)
-  @MaxLength(32)
   @Match('password')
   passwordConfirm: string;
 }

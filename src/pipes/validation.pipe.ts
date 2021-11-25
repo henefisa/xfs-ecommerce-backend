@@ -8,6 +8,7 @@ import {
 import { validate, ValidationError } from 'class-validator';
 import { plainToClass } from 'class-transformer';
 import { HttpException } from '@nestjs/common/exceptions/http.exception';
+import { capitalizeFirstLetter } from 'src/utils/capitalizeFirstLetter';
 
 @Injectable()
 export class ValidationPipe implements PipeTransform<any> {
@@ -38,12 +39,12 @@ export class ValidationPipe implements PipeTransform<any> {
   private buildError(errors: ValidationError[]) {
     const result = {};
 
-    console.log(errors);
-
     errors.forEach((el) => {
       const prop = el.property;
       Object.entries(el.constraints).forEach((constraint) => {
-        result[prop] = `${constraint[1]}`;
+        result[prop] = `${capitalizeFirstLetter(
+          constraint[1].substr(constraint[1].indexOf(' ') + 1),
+        )}`;
       });
     });
     return result;
