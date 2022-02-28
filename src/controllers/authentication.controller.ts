@@ -11,6 +11,7 @@ import {
   UseGuards,
   UsePipes,
 } from '@nestjs/common';
+import { ApiBody } from '@nestjs/swagger';
 import { compare } from 'bcrypt';
 import { Request } from 'express';
 
@@ -42,6 +43,7 @@ export class AuthenticationController {
   @Post('register')
   @HttpCode(HttpStatus.CREATED)
   @UsePipes(new ValidationPipe())
+  @ApiBody({ type: RegisterDTO })
   async register(@Body() body: RegisterDTO) {
     const isUsernameAvailable = await this.usersService.isUsernameAvailable(
       body.username,
@@ -67,6 +69,7 @@ export class AuthenticationController {
   @Post('login')
   @HttpCode(HttpStatus.ACCEPTED)
   @UsePipes(new ValidationPipe())
+  @ApiBody({ type: LoginDTO })
   async login(@Body() body: LoginDTO, @Req() request: Request) {
     const user = await this.usersService.getUserByUsername(body.username);
     if (!user) {
@@ -81,16 +84,12 @@ export class AuthenticationController {
     const accessToken = this.authenticationService.generateAccessToken(user);
     const refreshToken = this.authenticationService.generateRefreshToken(user);
 
-    this.usersService.setCurrentHashedRefreshToken(refreshToken.token, user.id);
+    this.usersService.setCurrentHashedRefreshToken(refreshToken, user.id);
 
-    request.res.setHeader('Set-Cookie', [
-      accessToken.cookie,
-      refreshToken.cookie,
-    ]);
-
-    delete user.password;
-
-    return user;
+    return {
+      accessToken,
+      refreshToken,
+    };
   }
 
   @Get('refresh-token')
@@ -109,18 +108,14 @@ export class AuthenticationController {
     );
 
     this.usersService.setCurrentHashedRefreshToken(
-      refreshToken.token,
+      refreshToken,
       request.user.id,
     );
 
-    request.res.setHeader('Set-Cookie', [
-      accessToken.token,
-      refreshToken.token,
-    ]);
-
-    delete request.user.password;
-
-    return request.user;
+    return {
+      accessToken,
+      refreshToken,
+    };
   }
 
   @Post('log-out')
@@ -131,10 +126,6 @@ export class AuthenticationController {
       throw new UnauthorizedException();
     }
     await this.usersService.removeHashedRefreshToken(request.user.id);
-    request.res.setHeader(
-      'Set-Cookie',
-      this.authenticationService.getCookieForLogout(),
-    );
 
     return {};
   }

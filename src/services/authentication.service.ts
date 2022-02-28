@@ -53,20 +53,10 @@ export class AuthenticationService {
     };
     const token = this.jwtService.sign(payload, {
       secret: process.env.ACCESS_TOKEN_SECRET,
-      expiresIn: '300s',
+      expiresIn: '1d',
     });
-    const cookie = `Authentication=${token}; HttpOnly; Path=/; Max-Age=${300})}`;
-    return {
-      token,
-      cookie,
-    };
-  }
 
-  getCookieForLogout() {
-    return [
-      'Authentication=; HttpOnly; Path=/; Max-Age=0',
-      'Refresh=; HttpOnly; Path=/; Max-Age=0',
-    ];
+    return token;
   }
 
   generateRefreshToken(user: User) {
@@ -75,10 +65,7 @@ export class AuthenticationService {
       secret: process.env.REFRESH_TOKEN_SECRET,
       expiresIn: '1d',
     });
-    const cookie = `Refresh=${token}; HttpOnly; Path=/; Max-Age=1d}`;
-    return {
-      token,
-      cookie,
-    };
+
+    return token;
   }
 }

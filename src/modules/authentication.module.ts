@@ -29,7 +29,7 @@ import { UsersModule } from '.';
     JwtModule.register({
       secret: process.env.ACCESS_TOKEN_SECRET,
       signOptions: {
-        expiresIn: '300s',
+        expiresIn: '1d',
       },
     }),
     PassportModule,

@@ -7,6 +7,7 @@ services:
       target: base
     volumes:
       - .:/server
+      - .:/node_modules
     command: yarn start:dev
     ports:
       - '7998:7998'

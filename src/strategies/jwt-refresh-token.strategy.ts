@@ -16,11 +16,7 @@ export class JWTRefreshTokenStrategy extends PassportStrategy(
 ) {
   constructor(private readonly usersService: UsersService) {
     super({
-      jwtFromRequest: ExtractJwt.fromExtractors([
-        (request: Request) => {
-          return request?.cookies?.Refresh;
-        },
-      ]),
+      jwtFromRequest: ExtractJwt.fromBodyField('refreshToken'),
       secretOrKey: process.env.REFRESH_TOKEN_SECRET,
       passReqToCallback: true,
       ignoreExpiration: false,
@@ -28,7 +24,7 @@ export class JWTRefreshTokenStrategy extends PassportStrategy(
   }
 
   async validate(request: Request, payload: TokenPayload) {
-    const refreshToken = request.cookies?.Refresh;
+    const { refreshToken } = request.body;
     if (!refreshToken) {
       return null;
     }
