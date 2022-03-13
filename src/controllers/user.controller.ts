@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 
 // DTO
-import { UpdateUserDTO } from 'src/DTO/users';
+import { UpdateUserDTO } from 'src/DTO/user';
 
 // guards
 import { JWTAuthenticationGuard } from 'src/guards';
@@ -20,16 +20,16 @@ import { JWTAuthenticationGuard } from 'src/guards';
 import { RequestWithUser } from 'src/interfaces';
 
 // services
-import { UsersService } from '../services/users.service';
+import { UserService } from '../services/user.service';
 
 @Controller('users')
 @UseGuards(new JWTAuthenticationGuard())
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly userService: UserService) {}
 
   @Patch('/:id')
   async updateUser(@Param('id') id: string, @Body() body: UpdateUserDTO) {
-    const user = await this.usersService.updateUser(id, body);
+    const user = await this.userService.updateUser(id, body);
     return {
       statusCode: HttpStatus.OK,
       user,
@@ -46,7 +46,7 @@ export class UsersController {
 
   @Get('/:id')
   async getUser(@Param('id') id: string) {
-    const user = await this.usersService.getUserById(id);
+    const user = await this.userService.getUserById(id);
     return {
       statusCode: HttpStatus.OK,
       user,
@@ -55,7 +55,7 @@ export class UsersController {
 
   @Get()
   async getUsers(@Query('limit') limit = 5, @Query('offset') offset = 0) {
-    const [users, count] = await this.usersService.getUsers(limit, offset);
+    const [users, count] = await this.userService.getUsers(limit, offset);
     return {
       statusCode: HttpStatus.OK,
       count,

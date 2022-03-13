@@ -6,11 +6,11 @@ import { PassportStrategy } from '@nestjs/passport';
 import { TokenPayload } from 'src/interfaces';
 
 // services
-import { UsersService } from 'src/services';
+import { UserService } from 'src/services';
 
 @Injectable()
 export class JWTStrategy extends PassportStrategy(Strategy) {
-  constructor(private readonly usersServices: UsersService) {
+  constructor(private readonly userServices: UserService) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
@@ -19,6 +19,6 @@ export class JWTStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: TokenPayload) {
-    return this.usersServices.getUserById(payload.userId);
+    return this.userServices.getUserById(payload.userId);
   }
 }

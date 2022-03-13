@@ -1,17 +1,15 @@
-import { BeforeInsert, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { BeforeInsert, Column, Entity } from 'typeorm';
 import { genSalt, hash } from 'bcrypt';
+import { BaseEntity } from './base.entity';
 
 @Entity()
-export class User {
+export class User extends BaseEntity {
   @BeforeInsert()
   async hashPassword() {
     const salt = await genSalt(10);
     const _pw = await hash(this.password, salt);
     this.password = _pw;
   }
-
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
 
   @Column({ unique: true })
   username: string;
@@ -36,10 +34,4 @@ export class User {
 
   @Column({ nullable: true, default: null })
   hashedRefreshToken: string;
-
-  @Column({ default: new Date() })
-  createdAt: Date;
-
-  @Column({ default: null, nullable: true })
-  updatedAt: Date;
 }

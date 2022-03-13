@@ -25,9 +25,7 @@ export class AuthenticationService {
   ) {}
 
   async register(data: RegisterDTO) {
-    const newUser = this.usersRepository.create(data);
-    await this.usersRepository.save(newUser);
-    return newUser;
+    return this.usersRepository.save(data);
   }
 
   async getAuthenticatedUser(username: string, password: string) {

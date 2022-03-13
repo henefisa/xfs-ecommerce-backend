@@ -1,3 +1,4 @@
-export * from './users.module';
+export * from './user.module';
 export * from './authentication.module';
 export * from './database.module';
+export * from './product.module';

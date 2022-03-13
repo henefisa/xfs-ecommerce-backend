@@ -31,13 +31,13 @@ import { RequestWithUser } from 'src/interfaces';
 import { ValidationPipe } from 'src/pipes';
 
 // services
-import { AuthenticationService, UsersService } from 'src/services';
+import { AuthenticationService, UserService } from 'src/services';
 
 @Controller('authentication')
 export class AuthenticationController {
   constructor(
     private readonly authenticationService: AuthenticationService,
-    private readonly usersService: UsersService,
+    private readonly userService: UserService,
   ) {}
 
   @Post('register')
@@ -45,14 +45,14 @@ export class AuthenticationController {
   @UsePipes(new ValidationPipe())
   @ApiBody({ type: RegisterDTO })
   async register(@Body() body: RegisterDTO) {
-    const isUsernameAvailable = await this.usersService.isUsernameAvailable(
+    const isUsernameAvailable = await this.userService.isUsernameAvailable(
       body.username,
     );
     if (!isUsernameAvailable) {
       throw new AlreadyUsedException('Username', body.username);
     }
 
-    const isEmailAvailable = await this.usersService.isEmailAvailable(
+    const isEmailAvailable = await this.userService.isEmailAvailable(
       body.email,
     );
     if (!isEmailAvailable) {
@@ -71,7 +71,7 @@ export class AuthenticationController {
   @UsePipes(new ValidationPipe())
   @ApiBody({ type: LoginDTO })
   async login(@Body() body: LoginDTO, @Req() request: Request) {
-    const user = await this.usersService.getUserByUsername(body.username);
+    const user = await this.userService.getUserByUsername(body.username);
     if (!user) {
       throw new NotFoundException(`${body.username} not found!`);
     }
@@ -84,7 +84,7 @@ export class AuthenticationController {
     const accessToken = this.authenticationService.generateAccessToken(user);
     const refreshToken = this.authenticationService.generateRefreshToken(user);
 
-    this.usersService.setCurrentHashedRefreshToken(refreshToken, user.id);
+    this.userService.setCurrentHashedRefreshToken(refreshToken, user.id);
 
     return {
       accessToken,
@@ -107,7 +107,7 @@ export class AuthenticationController {
       request.user,
     );
 
-    this.usersService.setCurrentHashedRefreshToken(
+    this.userService.setCurrentHashedRefreshToken(
       refreshToken,
       request.user.id,
     );
@@ -125,7 +125,7 @@ export class AuthenticationController {
     if (!request.user) {
       throw new UnauthorizedException();
     }
-    await this.usersService.removeHashedRefreshToken(request.user.id);
+    await this.userService.removeHashedRefreshToken(request.user.id);
 
     return {};
   }

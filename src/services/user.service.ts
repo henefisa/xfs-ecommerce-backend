@@ -4,13 +4,13 @@ import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 
 // DTO
-import { UpdateUserDTO } from 'src/DTO/users';
+import { UpdateUserDTO } from 'src/DTO/user';
 
 // entities
 import { User } from '../entities';
 
 @Injectable()
-export class UsersService {
+export class UserService {
   constructor(
     @InjectRepository(User) private usersRepository: Repository<User>,
   ) {}

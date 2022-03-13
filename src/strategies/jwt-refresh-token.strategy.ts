@@ -4,7 +4,7 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { Request } from 'express';
 
 // services
-import { UsersService } from 'src/services';
+import { UserService } from 'src/services';
 
 // interfaces
 import { TokenPayload } from 'src/interfaces';
@@ -14,7 +14,7 @@ export class JWTRefreshTokenStrategy extends PassportStrategy(
   Strategy,
   'jwt-refresh-token',
 ) {
-  constructor(private readonly usersService: UsersService) {
+  constructor(private readonly userService: UserService) {
     super({
       jwtFromRequest: ExtractJwt.fromBodyField('refreshToken'),
       secretOrKey: process.env.REFRESH_TOKEN_SECRET,
@@ -29,7 +29,7 @@ export class JWTRefreshTokenStrategy extends PassportStrategy(
       return null;
     }
 
-    return this.usersService.getUserIfRefreshTokenMatches(
+    return this.userService.getUserIfRefreshTokenMatches(
       refreshToken,
       payload.userId,
     );
