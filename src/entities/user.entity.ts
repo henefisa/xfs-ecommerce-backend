@@ -1,6 +1,8 @@
-import { BeforeInsert, Column, Entity } from 'typeorm';
+import { BeforeInsert, Column, Entity, OneToMany } from 'typeorm';
 import { genSalt, hash } from 'bcrypt';
 import { BaseEntity } from './base.entity';
+import { EUserRole, EUserStatus } from 'src/enums';
+import { ProductReview } from './product-review.entity';
 
 @Entity()
 export class User extends BaseEntity {
@@ -34,4 +36,18 @@ export class User extends BaseEntity {
 
   @Column({ nullable: true, default: null })
   hashedRefreshToken: string;
+
+  @Column({
+    type: 'enum',
+    enum: EUserRole,
+    array: true,
+    default: [EUserRole.USER],
+  })
+  roles: EUserRole[];
+
+  @Column({ type: 'enum', enum: EUserStatus, default: EUserStatus.ACTIVE })
+  status: EUserStatus;
+
+  @OneToMany(() => ProductReview, (productReview) => productReview.user)
+  reviews: ProductReview[];
 }

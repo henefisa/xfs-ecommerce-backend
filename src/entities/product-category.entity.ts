@@ -3,14 +3,11 @@ import { BaseEntity } from './base.entity';
 import { Product } from './product.entity';
 
 @Entity()
-export class ProductImage extends BaseEntity {
-  @ManyToOne(() => Product, (product) => product.images, {
-    cascade: true,
-    onDelete: 'CASCADE',
-  })
+export class ProductCategory extends BaseEntity {
+  @ManyToOne(() => Product, (product) => product.categories)
   @JoinColumn()
   product: Product;
 
   @Column()
-  url: string;
+  name: string;
 }
