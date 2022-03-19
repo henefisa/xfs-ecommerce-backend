@@ -29,11 +29,7 @@ export class UsersController {
 
   @Patch('/:id')
   async updateUser(@Param('id') id: string, @Body() body: UpdateUserDTO) {
-    const user = await this.userService.updateUser(id, body);
-    return {
-      statusCode: HttpStatus.OK,
-      user,
-    };
+    return this.userService.updateUser(id, body);
   }
 
   @UseGuards(JWTAuthenticationGuard)
@@ -46,18 +42,13 @@ export class UsersController {
 
   @Get('/:id')
   async getUser(@Param('id') id: string) {
-    const user = await this.userService.getUserById(id);
-    return {
-      statusCode: HttpStatus.OK,
-      user,
-    };
+    return this.userService.getUserById(id);
   }
 
   @Get()
   async getUsers(@Query('limit') limit = 5, @Query('offset') offset = 0) {
     const [users, count] = await this.userService.getUsers(limit, offset);
     return {
-      statusCode: HttpStatus.OK,
       count,
       users,
     };

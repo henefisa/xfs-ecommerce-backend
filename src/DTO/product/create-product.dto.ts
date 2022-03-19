@@ -1,5 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumberString, IsString } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsNumberString,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
 export class CreateProductDTO {
   @IsNotEmpty()
@@ -24,4 +29,9 @@ export class CreateProductDTO {
 
   @ApiProperty({ type: 'array', items: { type: 'string', format: 'binary' } })
   images: File[];
+
+  @IsString({ each: true })
+  @IsOptional()
+  @ApiProperty({ type: 'array', items: { type: 'string' }, required: false })
+  categories: string[];
 }

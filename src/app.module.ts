@@ -7,6 +7,7 @@ import {
   DatabaseModule,
   ProductModule,
   UsersModule,
+  CategoryModule,
 } from './modules';
 import { MulterModule } from '@nestjs/platform-express';
 import { ServeStaticModule } from '@nestjs/serve-static';
@@ -20,6 +21,7 @@ import { join } from 'path';
     UsersModule,
     AuthenticationModule,
     ProductModule,
+    CategoryModule,
     DatabaseModule,
     MulterModule.register(),
     ConfigModule.forRoot(),

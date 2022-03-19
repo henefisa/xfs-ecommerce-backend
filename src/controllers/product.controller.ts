@@ -16,16 +16,27 @@ import {
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { ApiConsumes } from '@nestjs/swagger';
 import { diskStorage } from 'multer';
-import { CreateProductDTO, UpdateProductDTO } from 'src/DTO/product';
-import { ProductService } from 'src/services';
 import { nanoid } from 'nanoid';
 import { extname } from 'path';
+
+// DTO
+import { CreateProductDTO, UpdateProductDTO } from 'src/DTO/product';
+
+// entities
+import { CategoryService, ProductService } from 'src/services';
+
+// pipes
 import { ValidationPipe } from 'src/pipes';
+
+// entities
 import { Product, ProductImage } from 'src/entities';
 
 @Controller('product')
 export class ProductController {
-  constructor(private readonly productService: ProductService) {}
+  constructor(
+    private readonly productService: ProductService,
+    private readonly categoryService: CategoryService,
+  ) {}
 
   @UseInterceptors(
     FilesInterceptor('images', undefined, {
@@ -66,6 +77,12 @@ export class ProductController {
 
     const images = await Promise.all(imagePromises);
     product.images = images;
+
+    const categories = await this.categoryService.getCategoriesByIds(
+      body.categories,
+    );
+
+    product.categories = categories;
 
     return this.productService.createProduct(product);
   }
@@ -124,5 +141,10 @@ export class ProductController {
   async deleteProduct(@Param('productId') productId: string) {
     await this.productService.deleteProduct(productId);
     return;
+  }
+
+  @Get('/:productId')
+  async getProductById(@Param('productId') productId: string) {
+    return this.productService.getProductById(productId);
   }
 }

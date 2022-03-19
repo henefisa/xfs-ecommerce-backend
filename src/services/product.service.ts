@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 // entities
-import { Product, ProductCategory, ProductImage } from 'src/entities';
+import { Product, ProductImage } from 'src/entities';
 
 @Injectable()
 export class ProductService {
@@ -11,8 +11,6 @@ export class ProductService {
     @InjectRepository(Product) private productRepository: Repository<Product>,
     @InjectRepository(ProductImage)
     private productImageRepository: Repository<ProductImage>,
-    @InjectRepository(ProductCategory)
-    private productCategoryRepository: Repository<ProductCategory>,
   ) {}
 
   async getProductById(id: string): Promise<Product | null> {
@@ -42,7 +40,7 @@ export class ProductService {
   }
 
   async getProducts() {
-    return this.productRepository.find({ relations: ['images'] });
+    return this.productRepository.find();
   }
 
   async updateProduct(productId: string, product: Product) {
@@ -51,17 +49,5 @@ export class ProductService {
 
   async deleteProduct(productId: string) {
     return this.productRepository.delete(productId);
-  }
-
-  async createProductCategory(productCategory: ProductCategory) {
-    return this.productCategoryRepository.save(productCategory);
-  }
-
-  async updateProductCategory(id: string, productCategory: ProductCategory) {
-    return this.productCategoryRepository.update(id, productCategory);
-  }
-
-  async deleteProductCategory(id: string) {
-    return this.productCategoryRepository.delete(id);
   }
 }
