@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 import {
   IsNotEmpty,
   IsNumberString,
@@ -26,6 +27,10 @@ export class CreateProductDTO {
   @IsString()
   @ApiProperty()
   description: string;
+
+  @Type(() => Object)
+  @ApiProperty()
+  details: Record<string, string>;
 
   @ApiProperty({ type: 'array', items: { type: 'string', format: 'binary' } })
   images: File[];

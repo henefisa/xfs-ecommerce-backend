@@ -12,6 +12,9 @@ export class ProductReview extends BaseEntity {
   @Column()
   content: string;
 
+  @Column()
+  like: number;
+
   @OneToMany(
     () => ProductReviewImage,
     (productReviewImage) => productReviewImage.productReview,

@@ -20,6 +20,9 @@ export class Product extends BaseEntity {
   @Column()
   description: string;
 
+  @Column({ type: 'simple-json', default: {} })
+  details: Record<string, string>;
+
   @OneToMany(() => ProductImage, (productImage) => productImage.product, {
     eager: true,
   })

@@ -3,6 +3,7 @@ import { genSalt, hash } from 'bcrypt';
 import { BaseEntity } from './base.entity';
 import { EUserRole, EUserStatus } from 'src/enums';
 import { ProductReview } from './product-review.entity';
+import { UserAddress } from './user-address.entity';
 
 @Entity()
 export class User extends BaseEntity {
@@ -50,4 +51,7 @@ export class User extends BaseEntity {
 
   @OneToMany(() => ProductReview, (productReview) => productReview.user)
   reviews: ProductReview[];
+
+  @OneToMany(() => UserAddress, (userAddress) => userAddress.user)
+  addresses: UserAddress[];
 }

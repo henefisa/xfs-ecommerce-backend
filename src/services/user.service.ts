@@ -7,12 +7,14 @@ import * as bcrypt from 'bcrypt';
 import { UpdateUserDTO } from 'src/DTO/user';
 
 // entities
-import { User } from '../entities';
+import { User, UserAddress } from '../entities';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User) private usersRepository: Repository<User>,
+    @InjectRepository(UserAddress)
+    private userAddressRepository: Repository<UserAddress>,
   ) {}
 
   async isUsernameAvailable(username: string): Promise<boolean> {
@@ -77,5 +79,17 @@ export class UserService {
 
   async removeHashedRefreshToken(userId: string) {
     return this.usersRepository.update(userId, { hashedRefreshToken: null });
+  }
+
+  async createUserAddress(userAddress: UserAddress) {
+    return this.userAddressRepository.save(userAddress);
+  }
+
+  async updateUserAddress(id: string, userAddress: UserAddress) {
+    return this.userAddressRepository.update(id, userAddress);
+  }
+
+  async deleteUserAddress(id: string) {
+    return this.userAddressRepository.delete(id);
   }
 }

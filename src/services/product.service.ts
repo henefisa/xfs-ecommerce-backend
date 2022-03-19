@@ -14,21 +14,7 @@ export class ProductService {
   ) {}
 
   async getProductById(id: string): Promise<Product | null> {
-    return this.productRepository.findOne(id);
-  }
-
-  async getProductImageById(id: string): Promise<ProductImage | null> {
-    return this.productImageRepository.findOne(id);
-  }
-
-  async getProductImagesByProductId(
-    id: string,
-  ): Promise<ProductImage[] | null> {
-    return this.productImageRepository.find({
-      where: {
-        productId: id,
-      },
-    });
+    return this.productRepository.findOne(id, { relations: ['reviews'] });
   }
 
   async createProductImage(image: ProductImage) {
