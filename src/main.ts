@@ -10,7 +10,7 @@ async function bootstrap() {
     .setTitle('XFS Ecommerce')
     .setDescription('XFS Ecommerce')
     .setVersion('1.0')
-    .addBearerAuth()
+    .addBearerAuth({ type: 'http' })
     .build();
   const document = SwaggerModule.createDocument(app, options);
   SwaggerModule.setup('api', app, document);

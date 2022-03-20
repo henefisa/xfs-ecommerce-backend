@@ -17,7 +17,7 @@ export class CategoryService {
   }
 
   async updateCategory(id: string, category: Category) {
-    return this.categoryRepository.update(id, category);
+    return this.categoryRepository.save({ id, category });
   }
 
   async deleteCategory(id: string) {

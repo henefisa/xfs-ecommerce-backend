@@ -1,7 +1,6 @@
 import {
   Body,
   Controller,
-  Get,
   HttpCode,
   HttpStatus,
   NotFoundException,
@@ -11,12 +10,14 @@ import {
   UseGuards,
   UsePipes,
 } from '@nestjs/common';
-import { ApiBody } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody } from '@nestjs/swagger';
 import { compare } from 'bcrypt';
-import { Request } from 'express';
 
 // DTO
 import { RegisterDTO, LoginDTO } from 'src/DTO/authentication';
+
+// entities
+import { User } from 'src/entities';
 
 // exceptions
 import AlreadyUsedException from 'src/exceptions/already-used.exception';
@@ -59,7 +60,10 @@ export class AuthenticationController {
       throw new AlreadyUsedException('Email', body.email);
     }
 
-    const user = await this.authenticationService.register(body);
+    const newUser = new User();
+    Object.assign(newUser, body);
+
+    const user = await this.authenticationService.register(newUser);
 
     delete user.password;
 
@@ -70,15 +74,15 @@ export class AuthenticationController {
   @HttpCode(HttpStatus.ACCEPTED)
   @UsePipes(new ValidationPipe())
   @ApiBody({ type: LoginDTO })
-  async login(@Body() body: LoginDTO, @Req() request: Request) {
+  async login(@Body() body: LoginDTO) {
     const user = await this.userService.getUserByUsername(body.username);
     if (!user) {
-      throw new NotFoundException(`${body.username} not found!`);
+      throw new NotFoundException(`Invalid username or password`);
     }
 
     const isValidPassword = await compare(body.password, user.password);
     if (!isValidPassword) {
-      throw new UnauthorizedException(`Invalid password!`);
+      throw new UnauthorizedException(`Invalid username or password`);
     }
 
     const accessToken = this.authenticationService.generateAccessToken(user);
@@ -92,7 +96,7 @@ export class AuthenticationController {
     };
   }
 
-  @Get('refresh-token')
+  @Post('refresh-token')
   @HttpCode(HttpStatus.OK)
   @UseGuards(JWTRefreshTokenGuard)
   async refreshToken(@Req() request: RequestWithUser) {
@@ -121,11 +125,15 @@ export class AuthenticationController {
   @Post('log-out')
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(JWTAuthenticationGuard)
+  @ApiBearerAuth()
   async logout(@Req() request: RequestWithUser) {
     if (!request.user) {
       throw new UnauthorizedException();
     }
-    await this.userService.removeHashedRefreshToken(request.user.id);
+
+    request.user.hashedRefreshToken = null;
+
+    await this.userService.removeHashedRefreshToken(request.user);
 
     return {};
   }

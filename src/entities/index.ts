@@ -6,3 +6,5 @@ export * from './product-review.entity';
 export * from './product-review-image.entity';
 export * from './base.entity';
 export * from './user-address.entity';
+export * from './order.entity';
+export * from './order-detail.entity';

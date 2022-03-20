@@ -1,9 +1,14 @@
 import { BeforeInsert, Column, Entity, OneToMany } from 'typeorm';
 import { genSalt, hash } from 'bcrypt';
-import { BaseEntity } from './base.entity';
+
+// enums
 import { EUserRole, EUserStatus } from 'src/enums';
+
+// entities
+import { BaseEntity } from './base.entity';
 import { ProductReview } from './product-review.entity';
 import { UserAddress } from './user-address.entity';
+import { Order } from './order.entity';
 
 @Entity()
 export class User extends BaseEntity {
@@ -54,4 +59,7 @@ export class User extends BaseEntity {
 
   @OneToMany(() => UserAddress, (userAddress) => userAddress.user)
   addresses: UserAddress[];
+
+  @OneToMany(() => Order, (order) => order.user)
+  orders: Order[];
 }

@@ -1,25 +1,25 @@
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import _ from 'lodash';
 
 // enums
 import { RequestWithUser } from 'src/interfaces';
-import { EUserRole } from 'src/enums';
+import { EUserStatus } from 'src/enums';
 
 @Injectable()
-export class RolesGuard implements CanActivate {
+export class StatusGuard implements CanActivate {
   constructor(private reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean {
-    const roles = this.reflector.get<EUserRole[]>(
-      'roles',
+    const status = this.reflector.get<EUserStatus>(
+      'status',
       context.getHandler(),
     );
-    if (!roles) {
+
+    if (!status) {
       return true;
     }
     const request = context.switchToHttp().getRequest<RequestWithUser>();
 
-    return !!_.intersection(request.user.roles, roles).length;
+    return request.user.status === EUserStatus.ACTIVE;
   }
 }

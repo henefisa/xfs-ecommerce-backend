@@ -14,6 +14,8 @@ import {
   ProductImage,
   ProductReview,
   ProductReviewImage,
+  OrderDetail,
+  Order,
 } from '../entities';
 import { CategoryService } from 'src/services';
 
@@ -25,6 +27,8 @@ import { CategoryService } from 'src/services';
       Category,
       ProductReview,
       ProductReviewImage,
+      Order,
+      OrderDetail,
     ]),
   ],
   providers: [ProductService, CategoryService],

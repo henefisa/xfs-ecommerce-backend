@@ -12,6 +12,7 @@ import {
 import { MulterModule } from '@nestjs/platform-express';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { OrderModule } from './modules/order.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { join } from 'path';
     AuthenticationModule,
     ProductModule,
     CategoryModule,
+    OrderModule,
     DatabaseModule,
     MulterModule.register(),
     ConfigModule.forRoot(),

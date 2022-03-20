@@ -11,9 +11,6 @@ import { JwtService } from '@nestjs/jwt';
 // entities
 import { User } from 'src/entities';
 
-// DTO
-import { RegisterDTO } from 'src/DTO/authentication';
-
 // interfaces
 import { TokenPayload } from 'src/interfaces';
 
@@ -24,8 +21,8 @@ export class AuthenticationService {
     private jwtService: JwtService,
   ) {}
 
-  async register(data: RegisterDTO) {
-    return this.usersRepository.save(data);
+  async register(user: User) {
+    return this.usersRepository.save(user);
   }
 
   async getAuthenticatedUser(username: string, password: string) {

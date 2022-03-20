@@ -6,6 +6,7 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  NotFoundException,
   Param,
   Patch,
   Post,
@@ -71,7 +72,7 @@ export class ProductController {
 
     const imagePromises = files.map((file) => {
       const image = new ProductImage();
-      image.url = '/' + file.filename;
+      image.url = '/uploads/' + file.filename;
       return this.productService.createProductImage(image);
     });
 
@@ -121,19 +122,26 @@ export class ProductController {
     @Body() body: UpdateProductDTO,
     @UploadedFiles() files: Array<Express.Multer.File>,
   ) {
-    const product = new Product();
+    const product = await this.productService.getProductById(productId);
+
+    if (!product) {
+      return new NotFoundException('Product not found');
+    }
+
     Object.assign(product, body);
 
-    const imagePromises = files.map((file) => {
-      const image = new ProductImage();
-      image.url = '/' + file.filename;
-      return this.productService.createProductImage(image);
-    });
+    if (files.length) {
+      const imagePromises = files.map((file) => {
+        const image = new ProductImage();
+        image.url = '/' + file.filename;
+        return this.productService.createProductImage(image);
+      });
 
-    const images = await Promise.all(imagePromises);
-    product.images = images;
+      const images = await Promise.all(imagePromises);
+      product.images = images;
+    }
 
-    return this.productService.updateProduct(productId, product);
+    return this.productService.updateProduct(product);
   }
 
   @Delete('/:productId')

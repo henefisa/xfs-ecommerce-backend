@@ -3,6 +3,7 @@ import { Column, Entity, JoinTable, ManyToMany, OneToMany } from 'typeorm';
 // entities
 import { BaseEntity } from './base.entity';
 import { Category } from './category.entity';
+import { OrderDetail } from './order-detail.entity';
 import { ProductImage } from './product-image.entity';
 import { ProductReview } from './product-review.entity';
 
@@ -36,4 +37,7 @@ export class Product extends BaseEntity {
 
   @OneToMany(() => ProductReview, (productReview) => productReview.product)
   reviews: ProductReview[];
+
+  @OneToMany(() => OrderDetail, (orderDetail) => orderDetail.product)
+  orderDetails: OrderDetail[];
 }

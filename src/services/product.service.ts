@@ -29,8 +29,8 @@ export class ProductService {
     return this.productRepository.find();
   }
 
-  async updateProduct(productId: string, product: Product) {
-    return this.productRepository.update(productId, product);
+  async updateProduct(product: Product) {
+    return this.productRepository.save(product);
   }
 
   async deleteProduct(productId: string) {
