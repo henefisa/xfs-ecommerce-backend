@@ -32,13 +32,18 @@ import { RequestWithUser } from 'src/interfaces';
 import { ValidationPipe } from 'src/pipes';
 
 // services
-import { AuthenticationService, UserService } from 'src/services';
+import {
+  AuthenticationService,
+  StripeService,
+  UserService,
+} from 'src/services';
 
 @Controller('authentication')
 export class AuthenticationController {
   constructor(
     private readonly authenticationService: AuthenticationService,
     private readonly userService: UserService,
+    private readonly stripeService: StripeService,
   ) {}
 
   @Post('register')
@@ -60,12 +65,19 @@ export class AuthenticationController {
       throw new AlreadyUsedException('Email', body.email);
     }
 
+    const stripeCustomer = await this.stripeService.createCustomer(
+      `${body.firstName + body.lastName}`,
+      body.email,
+    );
+
     const newUser = new User();
     Object.assign(newUser, body);
+    newUser.stripeCustomerId = stripeCustomer.id;
 
     const user = await this.authenticationService.register(newUser);
 
     delete user.password;
+    delete user.hashedRefreshToken;
 
     return user;
   }

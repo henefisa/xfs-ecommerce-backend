@@ -1,6 +1,9 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Connection, Repository } from 'typeorm';
+import { ConfigService } from '@nestjs/config';
+import * as moment from 'moment';
+import { nanoid } from 'nanoid';
 
 // entities
 import { Order, OrderDetail } from 'src/entities';
@@ -12,6 +15,7 @@ export class OrderService {
     @InjectRepository(Order) private orderRepository: Repository<Order>,
     @InjectRepository(OrderDetail)
     private orderDetailRepository: Repository<OrderDetail>,
+    private configService: ConfigService,
   ) {}
 
   async createOrder(order: Order, orderDetails: OrderDetail[]) {
@@ -41,5 +45,13 @@ export class OrderService {
 
   async getOrderById(id: string) {
     return this.orderRepository.findOne(id);
+  }
+
+  generateTrackingNumber() {
+    return `ORD${moment().format('YYMMDD') + nanoid(8)}`;
+  }
+
+  async getAllOrders() {
+    return this.orderRepository.find();
   }
 }

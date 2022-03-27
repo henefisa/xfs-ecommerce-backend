@@ -21,6 +21,7 @@ import {
 
 // modules
 import { UsersModule } from '.';
+import { StripeModule } from './stripe.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { UsersModule } from '.';
       },
     }),
     PassportModule,
+    StripeModule,
   ],
   exports: [AuthenticationService],
   providers: [

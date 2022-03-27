@@ -43,6 +43,9 @@ export class User extends BaseEntity {
   @Column({ nullable: true, default: null })
   hashedRefreshToken: string;
 
+  @Column()
+  stripeCustomerId: string;
+
   @Column({
     type: 'enum',
     enum: EUserRole,

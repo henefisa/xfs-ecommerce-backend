@@ -8,25 +8,24 @@ import {
   ProductModule,
   UsersModule,
   CategoryModule,
+  OrderModule,
+  UploadModule,
 } from './modules';
 import { MulterModule } from '@nestjs/platform-express';
-import { ServeStaticModule } from '@nestjs/serve-static';
-import { join } from 'path';
-import { OrderModule } from './modules/order.module';
 
 @Module({
   imports: [
-    ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'upload'),
-    }),
     UsersModule,
     AuthenticationModule,
     ProductModule,
     CategoryModule,
     OrderModule,
     DatabaseModule,
+    UploadModule,
     MulterModule.register(),
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
   NotFoundException,
@@ -17,6 +18,9 @@ import { CreateOrderDTO, UpdateOrderDTO } from 'src/DTO/order';
 
 // entities
 import { Order, OrderDetail } from 'src/entities';
+
+// enums
+import { EOrderPaymentType, EOrderStatus } from 'src/enums/order.enum';
 
 // guards
 import { JWTAuthenticationGuard } from 'src/guards';
@@ -53,6 +57,12 @@ export class OrderController {
       );
     }, {} as Record<string, number>);
 
+    if (order.paymentType !== EOrderPaymentType.CASH) {
+      order.status = EOrderStatus.WAIT_FOR_PAYMENT;
+    }
+
+    order.trackingNumber = this.orderService.generateTrackingNumber();
+
     const orderDetails = await Promise.all(
       Object.entries(transformed).map(async ([productId, quantity]) => {
         const product = await this.productService.getProductById(productId);
@@ -69,7 +79,12 @@ export class OrderController {
       }),
     );
 
-    return this.orderService.createOrder(order, orderDetails);
+    const createdOrder = await this.orderService.createOrder(
+      order,
+      orderDetails,
+    );
+
+    return createdOrder;
   }
 
   @Patch('/:id')
@@ -84,5 +99,12 @@ export class OrderController {
     order.status = body.status;
 
     return this.orderService.updateOrderStatus(order);
+  }
+
+  @Get()
+  @ApiBearerAuth()
+  @HttpCode(HttpStatus.OK)
+  async getAllOrders() {
+    return this.orderService.getAllOrders();
   }
 }
