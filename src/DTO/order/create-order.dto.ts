@@ -5,7 +5,9 @@ import {
   IsDefined,
   IsEnum,
   IsNumber,
+  IsPhoneNumber,
   IsString,
+  Min,
   ValidateNested,
 } from 'class-validator';
 import { EOrderPaymentType } from 'src/enums/order.enum';
@@ -17,6 +19,7 @@ export class OrderProductDTO {
 
   @IsNumber()
   @ApiProperty()
+  @Min(1)
   quantity: number;
 }
 
@@ -39,6 +42,7 @@ export class CreateOrderDTO {
 
   @IsString()
   @ApiProperty()
+  @IsPhoneNumber('VN')
   phoneNumber: string;
 
   @IsEnum(EOrderPaymentType)

@@ -34,6 +34,6 @@ export class ProductService {
   }
 
   async deleteProduct(productId: string) {
-    return this.productRepository.delete(productId);
+    return this.productRepository.softDelete(productId);
   }
 }

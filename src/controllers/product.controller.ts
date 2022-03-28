@@ -69,10 +69,12 @@ export class ProductController {
   ) {
     const product = new Product();
     Object.assign(product, body);
+    product.price = +body.price;
+    product.stock = +body.stock;
 
     const imagePromises = files.map((file) => {
       const image = new ProductImage();
-      image.url = '/uploads/' + file.filename;
+      image.url = '/upload/' + file.filename;
       return this.productService.createProductImage(image);
     });
 
@@ -129,11 +131,13 @@ export class ProductController {
     }
 
     Object.assign(product, body);
+    product.price = +body.price;
+    product.stock = +body.stock;
 
     if (files.length) {
       const imagePromises = files.map((file) => {
         const image = new ProductImage();
-        image.url = '/' + file.filename;
+        image.url = '/upload/' + file.filename;
         return this.productService.createProductImage(image);
       });
 
