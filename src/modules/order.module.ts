@@ -12,9 +12,14 @@ import { OrderService } from 'src/services';
 
 // modules
 import { ProductModule } from './product.module';
+import { StripeModule } from './stripe.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Order, OrderDetail]), ProductModule],
+  imports: [
+    TypeOrmModule.forFeature([Order, OrderDetail]),
+    ProductModule,
+    StripeModule,
+  ],
   providers: [OrderService],
   exports: [OrderService],
   controllers: [OrderController],

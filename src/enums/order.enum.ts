@@ -10,6 +10,5 @@ export enum EOrderStatus {
 
 export enum EOrderPaymentType {
   CASH = 'cash',
-  VNPAY = 'vnpay',
-  ZALOPAY = 'zalopay',
+  CARD = 'card',
 }

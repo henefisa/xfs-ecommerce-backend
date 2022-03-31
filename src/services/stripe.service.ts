@@ -1,7 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { EOrderPaymentType } from 'src/enums/order.enum';
 import Stripe from 'stripe';
+
+// enum
+import { EOrderPaymentType } from 'src/enums/order.enum';
 
 @Injectable()
 export class StripeService {

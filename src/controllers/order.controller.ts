@@ -32,7 +32,7 @@ import { RequestWithUser } from 'src/interfaces';
 import { ValidationPipe } from 'src/pipes';
 
 // services
-import { OrderService, ProductService } from 'src/services';
+import { OrderService, ProductService, StripeService } from 'src/services';
 
 @Controller('order')
 @UseGuards(new JWTAuthenticationGuard())
@@ -40,6 +40,7 @@ export class OrderController {
   constructor(
     private readonly orderService: OrderService,
     private readonly productService: ProductService,
+    private readonly stripeService: StripeService,
   ) {}
 
   @Post('/create')
@@ -84,7 +85,21 @@ export class OrderController {
       orderDetails,
     );
 
-    return createdOrder;
+    const amount = orderDetails.reduce(
+      (acc, val) => acc + val.price * val.quantity,
+      0,
+    );
+
+    const intent = await this.stripeService.charge(
+      amount,
+      order.paymentType,
+      request.user.stripeCustomerId,
+    );
+
+    return {
+      order: createdOrder,
+      intent: intent.client_secret,
+    };
   }
 
   @Patch('/:id')
