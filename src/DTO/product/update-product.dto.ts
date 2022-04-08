@@ -1,6 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsNumberString, IsOptional, IsString, Min } from 'class-validator';
+import {
+  IsNumberString,
+  IsOptional,
+  IsString,
+  IsUUID,
+  Min,
+  ValidateIf,
+} from 'class-validator';
 
 export class UpdateProductDTO {
   @IsOptional()
@@ -34,8 +41,12 @@ export class UpdateProductDTO {
   @ApiProperty({ type: 'array', items: { type: 'string', format: 'binary' } })
   images: File[];
 
-  @IsString({ each: true })
   @IsOptional()
+  @IsString({ each: true })
+  @IsUUID('4', { each: true })
+  @ValidateIf((_, value) => {
+    return value !== '';
+  })
   @ApiProperty({ type: 'array', items: { type: 'string' }, required: false })
   categories: string[];
 }

@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Connection, Repository } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
 import * as moment from 'moment';
-import { nanoid } from 'nanoid';
+import { v4 as uuidv4 } from 'uuid';
 
 // entities
 import { Order, OrderDetail } from 'src/entities';
@@ -48,7 +48,7 @@ export class OrderService {
   }
 
   generateTrackingNumber() {
-    return `ORD${moment().format('YYMMDD') + nanoid(8)}`;
+    return `ORD${moment().format('YYMMDD') + uuidv4()}`;
   }
 
   async getAllOrders() {

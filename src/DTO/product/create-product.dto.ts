@@ -5,7 +5,9 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  IsUUID,
   Min,
+  ValidateIf,
 } from 'class-validator';
 
 export class CreateProductDTO {
@@ -40,8 +42,12 @@ export class CreateProductDTO {
   @ApiProperty({ type: 'array', items: { type: 'string', format: 'binary' } })
   images: File[];
 
-  @IsString({ each: true })
   @IsOptional()
+  @IsString({ each: true })
+  @IsUUID('4', { each: true })
+  @ValidateIf((_, value) => {
+    return value !== '';
+  })
   @ApiProperty({ type: 'array', items: { type: 'string' }, required: false })
-  categories: string[];
+  categories?: string[];
 }

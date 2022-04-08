@@ -38,6 +38,7 @@ export class Product extends BaseEntity {
 
   @ManyToMany(() => Category, (category) => category.products, {
     eager: true,
+    nullable: true,
   })
   @JoinTable()
   categories: Category[];

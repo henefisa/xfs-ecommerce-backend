@@ -10,6 +10,7 @@ import {
   Param,
   Patch,
   Post,
+  Req,
   UploadedFiles,
   UseInterceptors,
   UsePipes,
@@ -17,7 +18,7 @@ import {
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { ApiConsumes } from '@nestjs/swagger';
 import { diskStorage } from 'multer';
-import { nanoid } from 'nanoid';
+import { v4 as uuidv4 } from 'uuid';
 import { extname } from 'path';
 
 // DTO
@@ -30,7 +31,14 @@ import { CategoryService, ProductService } from 'src/services';
 import { ValidationPipe } from 'src/pipes';
 
 // entities
-import { Product, ProductImage } from 'src/entities';
+import {
+  Product,
+  ProductImage,
+  ProductReview,
+  ProductReviewImage,
+} from 'src/entities';
+import { ReviewProductDTO } from 'src/DTO/product/review-product.dto';
+import { RequestWithUser } from 'src/interfaces';
 
 @Controller('product')
 export class ProductController {
@@ -38,6 +46,26 @@ export class ProductController {
     private readonly productService: ProductService,
     private readonly categoryService: CategoryService,
   ) {}
+
+  async findProduct(id: string) {
+    const product = await this.productService.getProductById(id);
+
+    if (!product) {
+      throw new NotFoundException('Product not found');
+    }
+
+    return product;
+  }
+
+  async findReview(id: string) {
+    const review = await this.productService.getProductReviewById(id);
+
+    if (!review) {
+      throw new NotFoundException('Review not found');
+    }
+
+    return review;
+  }
 
   @UseInterceptors(
     FilesInterceptor('images', undefined, {
@@ -55,7 +83,7 @@ export class ProductController {
             return cb(new BadRequestException('Only images are allowed'), null);
           }
 
-          cb(null, `${nanoid()}${extname(file.originalname)}`);
+          cb(null, `${uuidv4()}${extname(file.originalname)}`);
         },
       }),
     }),
@@ -80,12 +108,16 @@ export class ProductController {
 
     const images = await Promise.all(imagePromises);
     product.images = images;
+    product.categories = null;
 
-    const categories = await this.categoryService.getCategoriesByIds(
-      body.categories,
-    );
+    console.log(body.categories);
 
-    product.categories = categories;
+    if (body.categories.length) {
+      const categories = await this.categoryService.getCategoriesByIds(
+        body.categories,
+      );
+      product.categories = categories;
+    }
 
     return this.productService.createProduct(product);
   }
@@ -111,7 +143,7 @@ export class ProductController {
             return cb(new BadRequestException('Only images are allowed'), null);
           }
 
-          cb(null, `${nanoid()}${extname(file.originalname)}`);
+          cb(null, `${uuidv4()}${extname(file.originalname)}`);
         },
       }),
     }),
@@ -124,11 +156,7 @@ export class ProductController {
     @Body() body: UpdateProductDTO,
     @UploadedFiles() files: Array<Express.Multer.File>,
   ) {
-    const product = await this.productService.getProductById(productId);
-
-    if (!product) {
-      return new NotFoundException('Product not found');
-    }
+    const product = await this.findProduct(productId);
 
     Object.assign(product, body);
     product.price = +body.price;
@@ -151,12 +179,73 @@ export class ProductController {
   @Delete('/:productId')
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteProduct(@Param('productId') productId: string) {
-    await this.productService.deleteProduct(productId);
-    return;
+    return this.productService.deleteProduct(productId);
   }
 
   @Get('/:productId')
   async getProductById(@Param('productId') productId: string) {
     return this.productService.getProductById(productId);
   }
+
+  @UseInterceptors(
+    FilesInterceptor('images', undefined, {
+      storage: diskStorage({
+        destination: './upload',
+        filename: (req, file, cb) => {
+          const ext = extname(file.originalname);
+
+          if (
+            ext !== '.png' &&
+            ext !== '.jpg' &&
+            ext !== '.gif' &&
+            ext !== '.jpeg'
+          ) {
+            return cb(new BadRequestException('Only images are allowed'), null);
+          }
+
+          cb(null, `${uuidv4()}${extname(file.originalname)}`);
+        },
+      }),
+    }),
+  )
+  @Post('/:productId/review/create')
+  @ApiConsumes('multipart/form-data')
+  @UsePipes(new ValidationPipe())
+  async createReview(
+    @Req() request: RequestWithUser,
+    @Body() body: ReviewProductDTO,
+    @Param('productId') productId: string,
+    @UploadedFiles() files: Array<Express.Multer.File>,
+  ) {
+    const product = await this.findProduct(productId);
+
+    const review = new ProductReview();
+    review.content = body.content;
+    review.rating = body.rating;
+
+    if (files.length) {
+      const imagePromises = files.map((file) => {
+        const image = new ProductReviewImage();
+        image.url = '/upload/' + file.filename;
+        return this.productService.createProductReviewImage(image);
+      });
+
+      const images = await Promise.all(imagePromises);
+      review.images = images;
+    }
+
+    review.product = product;
+    review.user = request.user;
+
+    return this.productService.createProductReview(review);
+  }
+
+  @Post('/:productId/review/:id/like')
+  async likeReview(@Param('productId') productId: string) {
+    await this.findReview(productId);
+
+    return this.productService.updateReviewLike(productId);
+  }
+
+  async;
 }

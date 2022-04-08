@@ -18,6 +18,7 @@ export class ProductReview extends BaseEntity {
   @OneToMany(
     () => ProductReviewImage,
     (productReviewImage) => productReviewImage.productReview,
+    { onDelete: 'CASCADE' },
   )
   images: ProductReviewImage[];
 
