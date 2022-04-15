@@ -12,19 +12,19 @@ export class ProductReview extends BaseEntity {
   @Column()
   content: string;
 
-  @Column()
-  like: number;
+  @Column({ default: 0 })
+  count: number;
 
   @OneToMany(
     () => ProductReviewImage,
     (productReviewImage) => productReviewImage.productReview,
-    { onDelete: 'CASCADE' },
+    { onDelete: 'CASCADE', eager: true },
   )
   images: ProductReviewImage[];
 
   @ManyToOne(() => Product, (product) => product.reviews)
   product: Product;
 
-  @ManyToOne(() => User, (user) => user.reviews)
+  @ManyToOne(() => User, (user) => user.reviews, { eager: true })
   user: User;
 }

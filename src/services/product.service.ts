@@ -63,6 +63,6 @@ export class ProductService {
   }
 
   async updateReviewLike(id: string) {
-    return this.productReview.update(id, { like: () => 'like + 1' });
+    return this.productReview.update(id, { count: () => 'count + 1' });
   }
 }

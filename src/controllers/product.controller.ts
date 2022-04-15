@@ -241,11 +241,13 @@ export class ProductController {
   }
 
   @Post('/:productId/review/:id/like')
-  async likeReview(@Param('productId') productId: string) {
-    await this.findReview(productId);
+  async likeReview(
+    @Param('productId') productId: string,
+    @Param('id') id: string,
+  ) {
+    await this.findProduct(productId);
+    await this.findReview(id);
 
-    return this.productService.updateReviewLike(productId);
+    return this.productService.updateReviewLike(id);
   }
-
-  async;
 }
