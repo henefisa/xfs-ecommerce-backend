@@ -31,4 +31,8 @@ export class CategoryService {
   async getCategoriesByIds(ids: string[]) {
     return this.categoryRepository.findByIds(ids);
   }
+
+  async getCategories() {
+    return this.categoryRepository.find();
+  }
 }

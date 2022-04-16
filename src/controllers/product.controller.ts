@@ -12,6 +12,7 @@ import {
   Post,
   Req,
   UploadedFiles,
+  UseGuards,
   UseInterceptors,
   UsePipes,
 } from '@nestjs/common';
@@ -39,6 +40,7 @@ import {
 } from 'src/entities';
 import { ReviewProductDTO } from 'src/DTO/product/review-product.dto';
 import { RequestWithUser } from 'src/interfaces';
+import { JWTAuthenticationGuard } from 'src/guards';
 
 @Controller('product')
 export class ProductController {
@@ -89,6 +91,7 @@ export class ProductController {
     }),
   )
   @Post('/create')
+  @UseGuards(JWTAuthenticationGuard)
   @ApiConsumes('multipart/form-data')
   @UsePipes(new ValidationPipe())
   async createProduct(
@@ -109,8 +112,6 @@ export class ProductController {
     const images = await Promise.all(imagePromises);
     product.images = images;
     product.categories = null;
-
-    console.log(body.categories);
 
     if (body.categories.length) {
       const categories = await this.categoryService.getCategoriesByIds(
@@ -150,6 +151,7 @@ export class ProductController {
   )
   @Patch('/:productId')
   @UsePipes(new ValidationPipe())
+  @UseGuards(JWTAuthenticationGuard)
   @ApiConsumes('multipart/form-data')
   async updateProduct(
     @Param('productId') productId: string,
@@ -177,6 +179,7 @@ export class ProductController {
   }
 
   @Delete('/:productId')
+  @UseGuards(JWTAuthenticationGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteProduct(@Param('productId') productId: string) {
     return this.productService.deleteProduct(productId);
@@ -211,6 +214,7 @@ export class ProductController {
   @Post('/:productId/review/create')
   @ApiConsumes('multipart/form-data')
   @UsePipes(new ValidationPipe())
+  @UseGuards(JWTAuthenticationGuard)
   async createReview(
     @Req() request: RequestWithUser,
     @Body() body: ReviewProductDTO,
