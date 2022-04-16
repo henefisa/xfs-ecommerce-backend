@@ -8,3 +8,4 @@ export * from './base.entity';
 export * from './user-address.entity';
 export * from './order.entity';
 export * from './order-detail.entity';
+export * from './banner.entity';

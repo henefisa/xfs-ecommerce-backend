@@ -6,3 +6,4 @@ export * from './category.module';
 export * from './stripe.module';
 export * from './upload.module';
 export * from './order.module';
+export * from './banner.module';
