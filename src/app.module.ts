@@ -21,9 +21,9 @@ import { MulterModule } from '@nestjs/platform-express';
     ProductModule,
     CategoryModule,
     OrderModule,
-    DatabaseModule,
-    UploadModule,
     BannerModule,
+    UploadModule,
+    DatabaseModule,
     MulterModule.register(),
     ConfigModule.forRoot({
       isGlobal: true,
