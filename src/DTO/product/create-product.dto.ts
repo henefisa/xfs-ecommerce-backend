@@ -9,6 +9,7 @@ import {
   Min,
   ValidateIf,
 } from 'class-validator';
+import { File } from 'src/interfaces';
 
 export class CreateProductDTO {
   @IsNotEmpty()

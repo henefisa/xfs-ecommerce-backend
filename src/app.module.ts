@@ -10,6 +10,7 @@ import {
   CategoryModule,
   OrderModule,
   UploadModule,
+  BannerModule,
 } from './modules';
 import { MulterModule } from '@nestjs/platform-express';
 
@@ -22,6 +23,7 @@ import { MulterModule } from '@nestjs/platform-express';
     OrderModule,
     DatabaseModule,
     UploadModule,
+    BannerModule,
     MulterModule.register(),
     ConfigModule.forRoot({
       isGlobal: true,

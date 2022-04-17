@@ -8,6 +8,7 @@ import {
   Min,
   ValidateIf,
 } from 'class-validator';
+import { File } from 'src/interfaces';
 
 export class UpdateProductDTO {
   @IsOptional()
@@ -38,7 +39,11 @@ export class UpdateProductDTO {
   details: Record<string, string>;
 
   @IsOptional()
-  @ApiProperty({ type: 'array', items: { type: 'string', format: 'binary' } })
+  @ApiProperty({
+    type: 'array',
+    items: { type: 'string', format: 'binary' },
+    required: false,
+  })
   images: File[];
 
   @IsOptional()

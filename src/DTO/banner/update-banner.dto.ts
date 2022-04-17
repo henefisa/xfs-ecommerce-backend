@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsString } from 'class-validator';
 import { File } from 'src/interfaces';
 
-export class CreateBannerDTO {
+export class UpdateBannerDTO {
   @IsString()
   @ApiProperty()
   title: string;
@@ -11,6 +11,6 @@ export class CreateBannerDTO {
   @ApiProperty()
   description: string;
 
-  @ApiProperty({ type: 'string', format: 'binary' })
+  @ApiProperty({ type: 'string', format: 'binary', required: false })
   image: File;
 }
