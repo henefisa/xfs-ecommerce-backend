@@ -13,11 +13,11 @@ import {
   UseInterceptors,
   UsePipes,
 } from '@nestjs/common';
-import { FilesInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { v4 as uuidv4 } from 'uuid';
-import { ApiConsumes } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiConsumes } from '@nestjs/swagger';
 
 // services
 import { BannerService } from 'src/services';
@@ -39,7 +39,7 @@ export class BannerController {
   constructor(private readonly bannerService: BannerService) {}
 
   @UseInterceptors(
-    FilesInterceptor('images', undefined, {
+    FileInterceptor('image', {
       storage: diskStorage({
         destination: './upload',
         filename: (req, file, cb) => {
@@ -63,6 +63,7 @@ export class BannerController {
   @UseGuards(JWTAuthenticationGuard)
   @ApiConsumes('multipart/form-data')
   @UsePipes(new ValidationPipe())
+  @ApiBearerAuth()
   async create(
     @Body() body: CreateBannerDTO,
     @UploadedFile() file: Express.Multer.File,
@@ -75,7 +76,7 @@ export class BannerController {
   }
 
   @UseInterceptors(
-    FilesInterceptor('images', undefined, {
+    FileInterceptor('image', {
       storage: diskStorage({
         destination: './upload',
         filename: (req, file, cb) => {
@@ -99,6 +100,7 @@ export class BannerController {
   @UseGuards(JWTAuthenticationGuard)
   @ApiConsumes('multipart/form-data')
   @UsePipes(new ValidationPipe())
+  @ApiBearerAuth()
   async update(
     @Param('id') id: string,
     @Body() body: UpdateBannerDTO,
@@ -120,6 +122,7 @@ export class BannerController {
   }
 
   @Delete('/:id')
+  @ApiBearerAuth()
   async delete(@Param('id') id: string) {
     return this.bannerService.delete(id);
   }
