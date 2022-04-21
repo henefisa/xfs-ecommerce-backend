@@ -90,15 +90,20 @@ export class OrderController {
       0,
     );
 
-    const intent = await this.stripeService.charge(
-      amount,
-      order.paymentType,
-      request.user.stripeCustomerId,
-    );
+    if (order.paymentType !== EOrderPaymentType.CASH) {
+      const intent = await this.stripeService.charge(
+        amount,
+        request.user.stripeCustomerId,
+      );
+
+      return {
+        order: createdOrder,
+        intent: intent.client_secret,
+      };
+    }
 
     return {
       order: createdOrder,
-      intent: intent.client_secret,
     };
   }
 
@@ -121,5 +126,11 @@ export class OrderController {
   @HttpCode(HttpStatus.OK)
   async getAllOrders() {
     return this.orderService.getAllOrders();
+  }
+
+  @Get('/:id')
+  @ApiBearerAuth()
+  async getOrderById(@Param('id') id: string) {
+    return this.orderService.getOrderById(id);
   }
 }

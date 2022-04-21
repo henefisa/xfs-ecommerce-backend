@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString } from 'class-validator';
+import { IsEnum, IsString } from 'class-validator';
+import { EBannerType } from 'src/entities';
 import { File } from 'src/interfaces';
 
 export class CreateBannerDTO {
@@ -13,4 +14,8 @@ export class CreateBannerDTO {
 
   @ApiProperty({ type: 'string', format: 'binary' })
   image: File;
+
+  @IsEnum(EBannerType)
+  @ApiProperty({ enum: EBannerType })
+  type: EBannerType;
 }

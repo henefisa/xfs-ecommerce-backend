@@ -18,6 +18,7 @@ import {
   Order,
 } from '../entities';
 import { CategoryService } from 'src/services';
+import { CategoryModule } from './category.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { CategoryService } from 'src/services';
       Order,
       OrderDetail,
     ]),
+    CategoryModule,
   ],
   providers: [ProductService, CategoryService],
   exports: [ProductService],

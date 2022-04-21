@@ -10,6 +10,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   Req,
   UploadedFiles,
   UseGuards,
@@ -253,5 +254,15 @@ export class ProductController {
     await this.findReview(id);
 
     return this.productService.updateReviewLike(id);
+  }
+
+  @Get('/search')
+  async search(@Query('q') q: string) {
+    const [products, count] = await this.productService.search(q);
+
+    return {
+      products,
+      count,
+    };
   }
 }

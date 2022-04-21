@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 
 // entities
 import {
+  Category,
   Product,
   ProductImage,
   ProductReview,
@@ -20,6 +21,8 @@ export class ProductService {
     private productReview: Repository<ProductReview>,
     @InjectRepository(ProductReviewImage)
     private productReviewImage: Repository<ProductReviewImage>,
+    @InjectRepository(Category)
+    private categoryRepository: Repository<Category>,
   ) {}
 
   async getProductById(id: string): Promise<Product | null> {
@@ -64,5 +67,21 @@ export class ProductService {
 
   async updateReviewLike(id: string) {
     return this.productReview.update(id, { count: () => 'count + 1' });
+  }
+
+  async search(query: string) {
+    return this.productRepository.findAndCount({
+      where: {
+        name: Like(query),
+      },
+    });
+  }
+
+  async getByCategory(id: string) {
+    const category = await this.categoryRepository.findOne(id, {
+      relations: ['products'],
+    });
+
+    return category?.products || [];
   }
 }

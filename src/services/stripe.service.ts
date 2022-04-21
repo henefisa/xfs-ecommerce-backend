@@ -22,17 +22,14 @@ export class StripeService {
     });
   }
 
-  async charge(
-    amount: number,
-    paymentType: EOrderPaymentType,
-    customerId: string,
-  ) {
+  async charge(amount: number, customerId: string) {
     return this.stripe.paymentIntents.create({
       amount,
       customer: customerId,
-      currency: 'VND',
-      confirm: true,
-      payment_method: paymentType,
+      currency: 'usd',
+      automatic_payment_methods: {
+        enabled: true,
+      },
     });
   }
 }
