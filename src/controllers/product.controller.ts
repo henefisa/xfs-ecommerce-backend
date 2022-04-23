@@ -18,7 +18,7 @@ import {
   UsePipes,
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
-import { ApiConsumes } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiConsumes } from '@nestjs/swagger';
 import { diskStorage } from 'multer';
 import { v4 as uuidv4 } from 'uuid';
 import { extname } from 'path';
@@ -95,6 +95,7 @@ export class ProductController {
   @UseGuards(JWTAuthenticationGuard)
   @ApiConsumes('multipart/form-data')
   @UsePipes(new ValidationPipe())
+  @ApiBearerAuth()
   async createProduct(
     @Body() body: CreateProductDTO,
     @UploadedFiles() files: Array<Express.Multer.File>,
@@ -125,7 +126,11 @@ export class ProductController {
   }
 
   @Get()
-  async getProducts() {
+  async getProducts(@Query('category') category?: string) {
+    if (category) {
+      return this.productService.getByCategory(category);
+    }
+
     return this.productService.getProducts();
   }
 
@@ -154,6 +159,7 @@ export class ProductController {
   @UsePipes(new ValidationPipe())
   @UseGuards(JWTAuthenticationGuard)
   @ApiConsumes('multipart/form-data')
+  @ApiBearerAuth()
   async updateProduct(
     @Param('productId') productId: string,
     @Body() body: UpdateProductDTO,
@@ -182,6 +188,7 @@ export class ProductController {
   @Delete('/:productId')
   @UseGuards(JWTAuthenticationGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiBearerAuth()
   async deleteProduct(@Param('productId') productId: string) {
     return this.productService.deleteProduct(productId);
   }
@@ -216,6 +223,7 @@ export class ProductController {
   @ApiConsumes('multipart/form-data')
   @UsePipes(new ValidationPipe())
   @UseGuards(JWTAuthenticationGuard)
+  @ApiBearerAuth()
   async createReview(
     @Req() request: RequestWithUser,
     @Body() body: ReviewProductDTO,
@@ -246,6 +254,8 @@ export class ProductController {
   }
 
   @Post('/:productId/review/:id/like')
+  @UseGuards(JWTAuthenticationGuard)
+  @ApiBearerAuth()
   async likeReview(
     @Param('productId') productId: string,
     @Param('id') id: string,
